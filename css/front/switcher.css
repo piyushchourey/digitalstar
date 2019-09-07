@@ -1,0 +1,106 @@
+﻿/* Styles Switcher
+====================================================================== */
+
+	#style-switcher h3 {
+		color: #fff !important;
+		font-size: 13px !important;
+		margin: 5px 0 -5px 1px;
+		text-transform:uppercase;
+	}
+	
+	#style-switcher {
+		background-color: #303030;
+		width: 185px;
+		position:fixed;
+		top: 222px;
+		z-index: 999;		
+		left: -186px;
+		border-left: 0;
+		border-top: 0;
+		box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.08);
+	}
+
+	#style-switcher div {
+		padding: 2px 20px 10px 20px;
+	}
+	
+	#style-switcher h2 {
+		background-color: #303030;
+		color: #fff;
+		font-weight: bold;
+		font-size: 13px;
+		padding: 5px 0 5px 0px;
+        text-align: center;
+		text-transform:uppercase;
+      	
+	}
+	
+	#style-switcher h2 a {
+		background: url("../../images/switcher.png") no-repeat 5px center transparent;
+		background-color:#303030;
+		display: block;
+		height: 44px;
+		position: absolute;
+		right: -44px;
+		text-indent: -9999px;
+		top: 0px;
+		width: 44px;
+		z-index:999999!important;
+	}
+	
+	.colors {
+		list-style:none;
+		margin: 10px 0px 10px -20px;
+		overflow: hidden;
+	}
+	
+	.colors li {
+		float:left;
+		margin: 4px 2px 0 2px;
+	}
+	
+	.colors li a {
+		display: block;
+		width: 30px;
+		height: 30px;
+		cursor: pointer;
+		border-radius:0px;
+		border: 1px solid #fff;
+		margin: 2px;
+		
+	} 
+	.colors li a:active{
+		box-shadow:0 3px 3px rgba(0, 0, 0, 0.5) inset;
+	}
+	
+	.layout-style select,
+	.header-style select {
+		width: 140px;
+		padding: 5px;
+		color: #909090;
+		cursor: pointer;
+		border-radius: 2px;
+		font-size: 13px;
+		margin: 10px 0 10px 2px;
+		
+	}
+	
+	.layout-style,
+	.header-style { padding: 0 !important; }
+	
+	.colors .green    { background: #50B649; }
+	.colors .orange   { background: #f80; }
+	.colors .lavendar { background: #875abf; }
+	.colors .blue     { background: #089DE3; }	
+    .colors .red      { background: #c00; }	
+	.colors .brown    { background: #B84502; }
+	
+	.bg1 { background-image: url("../../images/themeparrot/bg/bg1.jpg"); }
+	.bg2 { background-image: url("../../images/themeparrot/bg/bg2.jpg"); }	
+	.bg3 { background-image: url("../../images/themeparrot/bg/bg3.jpg"); }
+	.bg4 { background-image: url("../../images/themeparrot/bg/bg4.jpg"); }
+	.bg5 { background-image: url("../../images/themeparrot/bg/bg5.jpg"); }
+	.bg6 { background-image: url("../../images/themeparrot/bg/bg6.jpg"); }
+
+	@media only screen and (max-width: 1023px) { #style-switcher { display: none; } }
+	   

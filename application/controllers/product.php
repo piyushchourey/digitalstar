@@ -1,0 +1,319 @@
+<?php
+class Product extends CI_Controller {
+	
+	function __construct() 
+	{
+		parent::__construct();
+		//$this->session_model->checkSession('admin');
+		$this->load->model('product_model'); 
+		$this->data = array();
+	}
+
+	public function index()
+	{
+		$this->data['sel']='Product';
+		$this->data['all_prdct']=$this->product_model->getAllprdct('products');
+		$this->data['body'] = 'admin/product';	
+		$this->load->view('structure', $this->data);
+	}
+	public function monthlySubscription()
+	{
+		$this->data['sel']='Monthly Subscription';
+		$this->data['pack_prdct']=$this->product_model->getAllprdctBycategory('category_type',2);
+		$category_type_info = $this->product_model->getAll('category_type_info','id',2);
+		if(!empty($category_type_info) && !empty($category_type_info[0]))
+		{
+			$pack = explode(",",($category_type_info[0]['pack_type']));
+               if(!empty($pack))
+               	{
+                  	$this->data['my_prdct'] = $this->product_model->getAllprdctBycategory_demo($pack);
+              	}
+		}
+		//die;
+		
+		$this->data['category_type_info']= $category_type_info;
+		$this->data['body'] = 'front/monthlySubscription';	
+		$this->load->view('structure', $this->data);
+	}
+	
+	public function create()
+	{
+		$this->data['sel']='Product';
+		$this->data['category']=$this->product_model->getAll('category');
+		$this->data['category_type_info']=$this->product_model->getAll('category_type_info','id',2);
+		$this->data['body'] = 'admin/addProduct';	
+		$this->load->view('structure', $this->data);
+	}
+
+	//add poduct..
+	public function add()
+	{
+		if(!empty($_POST))
+		{
+			if(isset($_POST['id']) && $_POST['id']!="")
+			{	
+				$id = $_POST['id']; 
+				if(!empty($_FILES) && !empty($_FILES['image']) && $_FILES['image']['name']!="")
+				{
+					$_POST['image'] = imageupload('image','images/products');	
+				}
+				else
+				{
+					if(isset($_POST['old_path']) && $_POST['old_path']!="")
+					{
+
+						$_POST['image'] = $_POST['old_path']; 
+					}
+					else
+						$filenm = 'no_image.jpg';
+				}
+				unset($_POST['old_path']); unset($_POST['id']);
+				if($_POST['discount_type']!="")
+				{
+					if($_POST['discount_type']=='percentage')
+						$_POST['discount_price'] = ($_POST['price'] - (($_POST['price']*$_POST['discount'])/100));
+					else
+						$_POST['discount_price'] = $_POST['price'] - $_POST['discount'];
+				}
+				if($this->product_model->update('products', $_POST,'id',$id))
+				{
+					$this->session->set_flashdata('status','success');
+					$this->session->set_flashdata('msg', 'Product Update Successfully.');
+				}
+				else
+				{
+					$this->session->set_flashdata('status','fail');
+					$this->session->set_flashdata('msg', 'Product Not Update Successfully.');
+				}
+				$url= "product";
+			}
+			else
+			{
+				if(!empty($_FILES) && !empty($_FILES['image']) && $_FILES['image']['name']!="")
+					$filenm = imageupload('image','images/products');	
+				else
+					$filenm = 'no_image.jpg';
+
+				if($this->session->userdata('type')=="admin")
+					$arr = array('status' => 1 , 'date'=>date('Y-m-d'),'image'=>$filenm );
+				else
+					$arr = array('status' => 0 , 'date'=>date('Y-m-d'),'image'=>$filenm );
+
+				if($_POST['discount_type']!="")
+				{
+					if($_POST['discount_type']=='percentage')
+						$_POST['discount_price'] = ($_POST['price'] - (($_POST['price']*$_POST['discount'])/100));
+					else
+						$_POST['discount_price'] = $_POST['price'] - $_POST['discount'];
+				}
+				
+				$_POST = $_POST + $arr;
+				if($this->product_model->insert('products', $_POST))
+				{
+					$this->session->set_flashdata('status','success');
+					$this->session->set_flashdata('msg', 'Product Add Successfully.');
+				}
+				else
+				{
+					$this->session->set_flashdata('status','fail');
+					$this->session->set_flashdata('msg', 'Product Not Add Successfully.');
+				}
+				$url= "product/create";
+			}
+		}
+		else
+		{
+			$this->session->set_flashdata('status','fail');
+			$this->session->set_flashdata('msg', 'Please Try Again..');
+		}
+		redirect($url);
+	}
+
+	public function edit($id)
+	{
+		$this->data['sel']='Product';
+		if(!empty($id))
+		{
+			$this->data['p_detail'] = $this->product_model->getAllprdct('products','products.id',$id);
+			$this->data['category']=$this->product_model->getAll('category');
+			$this->data['category_type_info']=$this->product_model->getAll('category_type_info','id',2);
+			$this->data['body'] = 'admin/editProduct';	
+			$this->load->view('structure', $this->data);
+		}
+		else
+		{
+			redirect('product');
+		}
+	}
+
+	public function delete()
+	{
+		if(!empty($_POST) && isset($_POST['id']))
+		{
+			if($this->product_model->delete('products','id',$_POST['id']))
+				$data = array('type' =>"success" , 'msg'=>'Product Delete Successfully.');
+			else
+				$data = array('type' =>"fail" , 'msg'=>'Product Not Delete Successfully.');
+		}
+		else
+		{
+			$data = array('type' =>"fail" , 'msg'=>'Please Try again!!');
+		}
+		echo json_encode($data);
+	}
+
+	public function status_change()
+	{
+		if(!empty($_POST) && isset($_POST['id']))
+		{
+			$prdct_detail = $this->product_model->getAll('products','id',$_POST['id']);
+			if(!empty($prdct_detail) && !empty($prdct_detail[0]))
+			{
+				if($prdct_detail[0]['status'])
+					$update_arr = array("status"=>0);
+				else
+					$update_arr = array("status"=>1);
+
+				if($this->product_model->update('products',$update_arr,'id',$_POST['id']))
+					$data = array('type' =>"success" , 'msg'=>'Product status update Successfully.');
+				else
+					$data = array('type' =>"fail" , 'msg'=>'Product status update Successfully.');
+			}
+		}
+		else
+		{
+			$data = array('type' =>"fail" , 'msg'=>'Please Try again!!');
+		}
+		echo json_encode($data);
+	}
+
+	public function monthly()
+	{
+		$this->data['sel']='Monthly Subscription';
+		$this->data['all_subscription']=$this->product_model->getAll('subscription');
+		$this->data['body'] = 'admin/monthly_subscription';	
+		$this->load->view('structure', $this->data);
+	}
+
+	public function addMonthly()
+	{
+		$this->data['sel']='Monthly Subscription';
+		$this->data['body'] = 'admin/addSubscription';	
+		$this->load->view('structure', $this->data);
+	}
+
+	public function insertSubscription()
+	{
+		if(!empty($_POST))
+		{
+			if(isset($_POST['id']) && $_POST['id']!="")
+			{	
+				$id = $_POST['id']; 
+				if(!empty($_FILES) && !empty($_FILES['image']) && $_FILES['image']['name']!="")
+				{
+					$_POST['p_image'] = imageupload('image','images/products');	
+				}
+				else
+				{
+					if(isset($_POST['old_path']) && $_POST['old_path']!="")
+					{
+
+						$_POST['p_image'] = $_POST['old_path']; 
+					}
+					else
+						$filenm = 'no_image.jpg';
+				}
+				unset($_POST['old_path']); unset($_POST['id']);
+
+				if($this->product_model->update('subscription', $_POST,'id',$id))
+				{
+					$this->session->set_flashdata('status','success');
+					$this->session->set_flashdata('msg', 'Subscription Update Successfully.');
+				}
+				else
+				{
+					$this->session->set_flashdata('status','fail');
+					$this->session->set_flashdata('msg', 'Subscription Not Update Successfully.');
+				}
+				$url= "product/monthly";
+			}
+			else
+			{
+				if(!empty($_FILES) && !empty($_FILES['image']) && $_FILES['image']['name']!="")
+					$filenm = imageupload('image','images/products');	
+				else
+					$filenm = 'no_image.jpg';
+
+				if($this->session->userdata('type')=="admin")
+					$arr = array('image'=>$filenm );
+				else
+					$arr = array('image'=>$filenm );
+
+				$_POST = $_POST + $arr;
+				if($this->product_model->insert('subscription', $_POST))
+				{
+					$this->session->set_flashdata('status','success');
+					$this->session->set_flashdata('msg', 'Subscription Add Successfully.');
+				}
+				else
+				{
+					$this->session->set_flashdata('status','fail');
+					$this->session->set_flashdata('msg', 'Subscription Not Add Successfully.');
+				}
+				$url= "product/addMonthly";
+			}
+		}
+		else
+		{
+				$this->session->set_flashdata('status','fail');
+				$this->session->set_flashdata('msg', 'Please Try Again!!');
+		}
+		redirect($url);
+	}
+
+	public function categoryWise($cat_id)
+	{
+		if($cat_id)
+		{
+			$this->data['sel'] = 'category/ produt';
+			$this->data['cat_product']=$this->product_model->getAllprdctBycategory('products.category_id',$cat_id);
+			$this->data['cat_id'] = $cat_id;
+			$this->data['body'] = 'front/product';
+			$this->load->view('structure', $this->data);
+		}
+		else
+		{
+			redirect('main');
+		}
+	}
+
+
+
+
+	/* old method */
+	public function assignSpecialCategory()
+	{
+		$id = $this->input->post('id');
+		$type = $this->input->post('type');
+		if($id){
+			echo json_encode(array('msg' => 'success'));
+		}else{
+			echo json_encode(array('msg' => 'failed'));
+		}
+	}
+
+	
+	public function getSubcat()
+
+	{
+
+		$catId = $_POST['catId'];
+
+		$data = $this->category_model->getLevelCategory('category',$catId);
+
+		echo json_encode($data);
+
+	}
+}
+
+?>
