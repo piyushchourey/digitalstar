@@ -11,11 +11,10 @@ class Login extends CI_Controller {
 			//$this->load->model('admin_model'); 
 			$this->data['sel']='login';
 	} 
-	function index()
+	public function index()
 	{
 		$this->load->view('signin');
 	}
-	
 	public function forgotPassword()
 		{
 			$uname = $_POST['username'];
@@ -48,9 +47,13 @@ class Login extends CI_Controller {
 	
 	public function signIn() 
 	{			
-		$email = $this->input->post('email');
-		$password = $this->input->post('password');
-		$result = $this->login_model->signIn($email,md5($password));
+		if(isset($_POST['loginType']) && $_POST['loginType']=='user'){
+
+		}else{
+			$email = $this->input->post('email');
+			$password = $this->input->post('password');
+			$result = $this->login_model->signIn($email,md5($password));
+		}
 		if(!empty($result))
 		{	
 			$this->session->set_userdata('user_id',$result['id']);
@@ -64,7 +67,13 @@ class Login extends CI_Controller {
 		{
 			$this->session->set_flashdata('login', 'false');
 			$this->session->set_flashdata('msg', 'Username Or Password is invalid.');
-			redirect('/');
+			redirect('/admin');
+		}
+	}
+	/** Get OTP from API for user login authentication */
+	public function getOTP(){                                                      
+		if($_POST['mobile'] && is_int($_POST['mobile'])){
+			return array("type"=>"success","otp"=>"123456");
 		}
 	}
 }

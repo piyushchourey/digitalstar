@@ -4,7 +4,7 @@
 	if($this->session->userdata('type')=='admin')
 		$this->load->view('header_admin');
 	else
-		$this->load->view('header');
+		$this->load->view('header_admin');
 	?>
 <!-- header ends here --> 
   
@@ -18,7 +18,7 @@
 	if($this->session->userdata('type')=='admin')
 		$this->load->view('footer_admin');
 	else
-		$this->load->view('footer');?>
+		$this->load->view('footer_admin');?>
 <!-- footer ends here -->
 
  

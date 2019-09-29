@@ -2,7 +2,7 @@
 	<div class="row">
 		<div class="col-md-8">
 			<h2 class="pull-left">
-				<i class="fa fa-tag"></i><?php echo $sel; ?>
+				<i class="fa fa-users"></i><?php echo $sel; ?>
 				<span>List</span>
 			</h2>
 		</div>
@@ -22,11 +22,12 @@
 					<thead>
 
 						<tr>
-
 							<th>S.No.</th>
-
-							<th>Category Name</th>
-
+							<th>Email ID</th>
+							<th>Mobile Number</th>
+							<th>Role</th>
+							<th>Created date</th>
+							<th>Status</th>
 							<th>Action</th>
 						</tr>
 
@@ -35,37 +36,29 @@
 					<tbody id="mutisearchingTbody">
 
 					<?php if(!empty($result))
-
 					{
-
 						$i=1;
-
 						foreach($result as $r)
-
 						{ ?>
-
 							<tr id="row_<?php echo $r['id']; ?>">
-
 								<td> <?php echo $i++; ?></td>
-
-								<td> <?php echo ucfirst($r['name']); ?></td>
-
-								<td>
-
-									<a class="btn btn-primary btn-xs edit"  data-toggle="modal" data-target="#editModal"  main="<?php echo $r['id']; ?>" title="Edit Category"><i class="fa fa-pencil"></i></a>
-
-									<a class="btn btn-danger btn-xs delete" main="<?php echo $r['id']; ?>" title="Delete Category"><i class="fa fa-trash-o"></i></a>
-
+								<td> <?php echo ucfirst($r['email']); ?></td>
+								<td> <?php echo $r['mobileNumber']; ?></td>
+								<td> <?php echo ucfirst($r['type']); ?></td>
+								<td> <?php echo $r['dateTime']; ?></td>
+								<td> <?php if($r['status']) 
+										echo '<button class="btn btn-success btn-xs">Approved</button>'; 
+									else
+										echo '<button class="btn btn-danger">Pending</button>';
+								?>
 								</td>
-
-								
-
+								<td>
+									<!-- <a class="btn btn-primary btn-xs edit"  data-toggle="modal" data-target="#editModal"  main="<?php echo $r['id']; ?>" title="Edit Category"><i class="fa fa-pencil"></i></a> -->
+									<a class="btn btn-danger btn-xs delete" main="<?php echo $r['id']; ?>" title="Delete Category"><i class="fa fa-trash-o"></i></a>
+								</td>
 							</tr>
-
 						<?php }
-
-					} ?>
-
+						} ?>
 					</tbody>
 
 			</table>
@@ -80,31 +73,48 @@
 
 	<!-- Modal -->
 <div id="categoryModal" class="modal fade" role="dialog">
-  <div class="modal-dialog modal-md">
+  <div class="modal-dialog modal-sm">
 	<!-- Modal content-->
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title" id="myModalLabel">Add Category</h4>
+        <h4 class="modal-title" id="myModalLabel">Add Employee</h4>
       </div>
-      <form id="categoryForm" action="" class="" method="post" enctype="multipart/form-data">
+      <form id="employeeForm" action="" class="" method="post" enctype="multipart/form-data">
       <div class="modal-body">
-        	<div class="form-group">
+			<div class="form-group">
 				<div class="">
-				  	<label>Category Type Name</label>
-					<select name="category_type_name" class="form-control" id="category_type_name">
-						<option value="">Select Type</option>
-						<?php if(!empty($cat_type_info))
-						{
-							foreach ($cat_type_info as $cat) { ?>
-								<option value="<?php echo $cat['type_name']; ?>"><?php echo ucfirst($cat['type_name']); ?></option>
-							<?php }
-						}
-						?>
-					</select>
+					<label>Email ID</label>
+					<input class="form-control valid" type="text" name="email" id="email" required="" placeholder="Email ID">
+					<input type="hidden" name="id" id="hidden_id" value="">	
 				</div>
 			</div>
 			<div class="form-group">
+				<div class="">
+					<label>Password</label>
+					<input class="form-control valid" type="password" name="password" id="password" required="" placeholder="Password">
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="">
+					<label>Mobile Number</label>
+					<input class="form-control valid" type="text" name="mobileNumber" id="mobileNumber" required="" placeholder="Mobile Number">
+				</div>
+			</div>
+  			<div class="form-group">
+			  	<label>Role</label>
+				<select name="type" class="form-control" id="type">
+					<option value="">Select Role</option>
+					<?php if(!empty($emp_type_info))
+					{
+						foreach ($emp_type_info as $emp) { ?>
+							<option value="<?php echo $emp['name']; ?>"><?php echo ucfirst($emp['name']); ?></option>
+						<?php }
+					}
+					?>
+				</select>
+			</div>
+        	<div class="form-group">
 				<button type="submit" id="category-submit-btn" class="btn btn-success btn-block btn_category">Add</button>
 			</div>
       </div>
@@ -143,7 +153,7 @@ $(document).ready(function(){
 
   	$(".addItemButton").click(function(){
 		$("#hidden_id").val("");
-		$("#myModalLabel").html("Add Category");
+		$("#myModalLabel").html("Add Employee");
 		$("#category-submit-btn").html("Submit");
 	});
 
@@ -173,6 +183,7 @@ $(document).ready(function(){
 			{
 				var name = obj['html'][0]['name']; var id = obj['html'][0]['id'];
 				
+				jQuery("#category_type").val(obj['html'][0]['category_type']);
 				jQuery("#categoryName").val(name);
 				
 				jQuery("#hidden_id").val(id);  
@@ -202,12 +213,12 @@ $(document).ready(function(){
 
 	$(".table").on('click','.delete',function(){
 		var id = $(this).attr('main');
-		bootbox.confirm("Are You Sure You Want to Delete this category?", function(result) {
+		bootbox.confirm("Are You Sure You Want to Delete this Employee?", function(result) {
 		if(result == true)
 		{
 			$.ajax({
 
-				url:"<?php echo base_url(); ?>category/delete",
+				url:"<?php echo base_url(); ?>employee/delete",
 
 				type:"post",
 
@@ -318,63 +329,62 @@ $(document).ready(function(){
 
 	
 //---------------Update Category Submit
-var form_object = jQuery("#categoryForm"); 
+var form_object = jQuery("#employeeForm"); 
+form_object.validate({
+	rules: {
+			email: {
+				required: true,
+				email:true
+			},
+			password: {
+				required: true
+			},
+			mobileNumber: {
+				required: true,
+				digits: true,
+				minlength:10,
+				maxlength:10
+			},
+			type: {
+				required: true
+			}
+			
+		},
+highlight: function(element) {
+	jQuery(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+},
+success: function(element) {
+	jQuery(element).closest('.form-group').removeClass('has-error');
+},
+submitHandler: function() {
+	var form_data = new FormData($('#employeeForm')[0]);
+	if(form_data != "")  
+	{
 
-  form_object.validate({
+		$.ajax({
 
-    rules: {
-            name: {
-                   required: true
-				}
-	 	},
+			type: "POST",
 
+			url: "<?php echo base_url('employee/add');?>",
 
+			data: form_data,                    
 
-    highlight: function(element) {
+			cache: false,
 
-      jQuery(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+			contentType: false,
 
-    },
+			processData: false,
 
-    success: function(element) {
-
-    jQuery(element).closest('.form-group').removeClass('has-error');
-
-    },
-
-    submitHandler: function() {
-
-      var form_data = new FormData($('#categoryForm')[0]);
-
-	  console.log(form_data);
-
-      if(form_data != "")  
-		{
-
-          $.ajax({
-
-            type: "POST",
-
-            url: "<?php echo base_url('category/add');?>",
-
-            data: form_data,                    
-
-            cache: false,
-
-            contentType: false,
-
-            processData: false,
-
-            beforeSend: function()
+			beforeSend: function()
 			{
-			 	$('.loading').show();
-                $('.loading_icon').show();
-             },
-            success: function(result)
-            {
-            	$('.loading').hide();
-            	$('.loading_icon').hide();
-                if(result != "")
+				$('.loading').show();
+				$('.loading_icon').show();
+			},
+			success: function(result)
+			{
+				$('.loading').hide();
+				$('.loading_icon').hide();
+				if(result != "")
 				{
 					var res = jQuery.parseJSON(result);
 					if(res.type=="success")
@@ -387,7 +397,7 @@ var form_object = jQuery("#categoryForm");
 					}
 					
 					$('#categoryModal').modal('hide');
-					setTimeout(window.location.reload.bind(window.location), 500);
+					//setTimeout(window.location.reload.bind(window.location), 500);
 					//location.reload();
 				}
 				else
@@ -395,10 +405,9 @@ var form_object = jQuery("#categoryForm");
 					$.growl.notice({title: "<i class='fa fa-times'> Sorry.. </i>", message: "Please Try Again!!!" });
 				}
 			}
-          }); 
-        }
+		}); 
 	}
-
+}
 });
 });
 

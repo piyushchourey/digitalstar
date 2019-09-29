@@ -2,7 +2,7 @@
 	<div class="row">
 		<div class="col-md-8">
 			<h2 class="pull-left">
-				<i class="fa fa-tag"></i><?php echo $sel; ?>
+				<i class="fa fa-gamepad"></i><?php echo $sel; ?>
 				<span>List</span>
 			</h2>
 		</div>
@@ -22,11 +22,10 @@
 					<thead>
 
 						<tr>
-
 							<th>S.No.</th>
-
-							<th>Category Name</th>
-
+							<th>Name</th>
+							<th>Created By</th>
+							<th>Date</th>
 							<th>Action</th>
 						</tr>
 
@@ -41,23 +40,23 @@
 						$i=1;
 
 						foreach($result as $r)
-
 						{ ?>
 
 							<tr id="row_<?php echo $r['id']; ?>">
 
 								<td> <?php echo $i++; ?></td>
-
 								<td> <?php echo ucfirst($r['name']); ?></td>
+								<td> <?php echo ucfirst($r['email']); ?></td>
+								<td> <?php echo ucfirst(ymddate($r['dateTime'])); ?></td>
 
 								<td>
 
-									<a class="btn btn-primary btn-xs edit"  data-toggle="modal" data-target="#editModal"  main="<?php echo $r['id']; ?>" title="Edit Category"><i class="fa fa-pencil"></i></a>
+									<a class="btn btn-primary btn-xs edit"  data-toggle="modal" data-target="#categoryModal"  main="<?php echo $r['id']; ?>" title="Edit Category"><i class="fa fa-pencil"></i></a>
 
 									<a class="btn btn-danger btn-xs delete" main="<?php echo $r['id']; ?>" title="Delete Category"><i class="fa fa-trash-o"></i></a>
 
 								</td>
-
+ 
 								
 
 							</tr>
@@ -80,28 +79,21 @@
 
 	<!-- Modal -->
 <div id="categoryModal" class="modal fade" role="dialog">
-  <div class="modal-dialog modal-md">
+  <div class="modal-dialog modal-sm">
 	<!-- Modal content-->
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title" id="myModalLabel">Add Category</h4>
+        <h4 class="modal-title" id="myModalLabel">Add Campaign</h4>
       </div>
-      <form id="categoryForm" action="" class="" method="post" enctype="multipart/form-data">
+      <form id="campaignForm" action="" class="" method="post" enctype="multipart/form-data">
       <div class="modal-body">
-        	<div class="form-group">
+  			<div class="form-group">
 				<div class="">
-				  	<label>Category Type Name</label>
-					<select name="category_type_name" class="form-control" id="category_type_name">
-						<option value="">Select Type</option>
-						<?php if(!empty($cat_type_info))
-						{
-							foreach ($cat_type_info as $cat) { ?>
-								<option value="<?php echo $cat['type_name']; ?>"><?php echo ucfirst($cat['type_name']); ?></option>
-							<?php }
-						}
-						?>
-					</select>
+				  	<label>Campaign Name</label>
+					<input class="form-control valid" type="text" name="name" id="name" required="" placeholder="Campaign Name">
+					<label for="categoryName" class="error"></label><br>
+					<input type="hidden" name="id" id="hidden_id" value="">	
 				</div>
 			</div>
 			<div class="form-group">
@@ -143,7 +135,7 @@ $(document).ready(function(){
 
   	$(".addItemButton").click(function(){
 		$("#hidden_id").val("");
-		$("#myModalLabel").html("Add Category");
+		$("#myModalLabel").html("Add Campaign");
 		$("#category-submit-btn").html("Submit");
 	});
 
@@ -153,13 +145,13 @@ $(document).ready(function(){
 
 		var id = $(this).attr('main');
 
-		$("#myModalLabel").html("Edit Category");
+		$("#myModalLabel").html("Edit Campaign");
 
 		$("#category-submit-btn").html("Update");
 
 		$.ajax({
 
-          url:"<?php echo base_url('category/getEditdata'); ?>",
+          url:"<?php echo base_url('campaign/getEditdata'); ?>",
 
           type:"post",
 
@@ -172,8 +164,7 @@ $(document).ready(function(){
 			if(obj.type!="fail")
 			{
 				var name = obj['html'][0]['name']; var id = obj['html'][0]['id'];
-				
-				jQuery("#categoryName").val(name);
+				jQuery("#name").val(name);
 				
 				jQuery("#hidden_id").val(id);  
 				
@@ -202,12 +193,12 @@ $(document).ready(function(){
 
 	$(".table").on('click','.delete',function(){
 		var id = $(this).attr('main');
-		bootbox.confirm("Are You Sure You Want to Delete this category?", function(result) {
+		bootbox.confirm("Are You Sure You Want to Delete this campaign?", function(result) {
 		if(result == true)
 		{
 			$.ajax({
 
-				url:"<?php echo base_url(); ?>category/delete",
+				url:"<?php echo base_url(); ?>campaign/delete",
 
 				type:"post",
 
@@ -234,91 +225,8 @@ $(document).ready(function(){
 });
 
 
-
-//searching category
-
-        $(".search").change(function(){
-
-		var categoryId = $(this).val();
-
-		if(categoryId)
-
-		{
-
-			var baseUrl = "<?php echo base_url('category/searching'); ?>";
-
-			$.ajax({
-
-				url: baseUrl,
-
-				type:"post",
-
-				data:"categoryId="+categoryId,                    
-
-				success: function(data){
-
-					if(data!="")
-
-					{
-
-						//console.log(data);
-
-						var append = "";
-
-						var abc = jQuery.parseJSON(data)
-
-						if(abc!="childNotavailable")
-
-						{
-
-							if(abc.length >0)
-
-							{
-
-								for(i=0,j=1;i<abc.length;i++,j++)
-
-								{
-									append+="<tr id=row_"+abc[i]['id']+"><td>"+j+"</td><td>"+abc[i]['name']+"</td><td>"+abc[i]['parentName']+"</td><td><a class='btn btn-primary btn-xs edit'  data-toggle='modal' data-target='#editModal'  main="+abc[i]['id']+"><i class='fa fa-pencil'></i></a>&nbsp;<a class='btn btn-danger btn-xs delete' main="+abc[i]['id']+" title='Delete Student'><i class='fa fa-trash-o'></i></a></td>";
-
-								}
-
-							}
-
-							else
-
-							{
-
-								append+="<td valign='top' colspan='7' class='dataTables_empty' style='padding:10px'>No matching records found</td>";
-
-							}
-
-						}
-
-						else
-
-						{
-
-							append+="<td valign='top' colspan='7' class='dataTables_empty' style='padding:10px'>No Child Available of this Category.</td>";
-
-						}
-
-						$("#mutisearchingTbody").html(append);
-
-					}
-
-				}
-
-		  });
-
-		}
-
-
-
-	}); 
-
-	
-//---------------Update Category Submit
-var form_object = jQuery("#categoryForm"); 
+//---------------Update Campaign Submit
+var form_object = jQuery("#campaignForm"); 
 
   form_object.validate({
 
@@ -344,7 +252,7 @@ var form_object = jQuery("#categoryForm");
 
     submitHandler: function() {
 
-      var form_data = new FormData($('#categoryForm')[0]);
+      var form_data = new FormData($('#campaignForm')[0]);
 
 	  console.log(form_data);
 
@@ -355,7 +263,7 @@ var form_object = jQuery("#categoryForm");
 
             type: "POST",
 
-            url: "<?php echo base_url('category/add');?>",
+            url: "<?php echo base_url('campaign/add');?>",
 
             data: form_data,                    
 
@@ -369,7 +277,7 @@ var form_object = jQuery("#categoryForm");
 			{
 			 	$('.loading').show();
                 $('.loading_icon').show();
-             },
+            },
             success: function(result)
             {
             	$('.loading').hide();
@@ -387,7 +295,7 @@ var form_object = jQuery("#categoryForm");
 					}
 					
 					$('#categoryModal').modal('hide');
-					setTimeout(window.location.reload.bind(window.location), 500);
+					//setTimeout(window.location.reload.bind(window.location), 500);
 					//location.reload();
 				}
 				else

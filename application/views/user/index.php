@@ -7,15 +7,26 @@
   <meta name="author" content="">
   <link rel="shortcut icon" href="<?php echo base_url(); ?>css/admin/images/favicon.png" type="image/png">
 
-  <title>The digital star | Admin Panel</title>
+  <title>Digital Star | User Panel</title>
 
   <link href="<?php echo base_url(); ?>css/admin/style.default.css" rel="stylesheet">
-  
-  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-  <!--[if lt IE 9]>
-  <script src="<?php //echo base_url(); ?>js/admin/html5shiv.js"></script>
-  <script src="<?php //echo base_url(); ?>js/admin/respond.min.js"></script>
-  <![endif]-->
+  <style>
+  #my_signin_form h4 , p, a#forgot_link, #my_forgot_form h4, #my_forgot_form a#signin_link
+  {
+	  color:#fff;
+  }
+  .signinpanel form
+  {
+	  background:none;
+  }
+  .signup-footer
+  {
+	  border-top:none;
+  }
+  label.error{
+    color:#fff;
+  }
+  </style>
 </head>
 
 <body class="signin">
@@ -50,17 +61,17 @@
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true"></button>
                 <strong> </strong>Please Enter Username Or Password
                 </div>
-                <form method="post" action="<?php echo base_url();?>login/signIn" method="post" id="my_signin_form">
+                <form method="post" id="my_signin_form">
                     <h4 class="nomargin">Sign In</h4>
-                    <p class="mt5 mb20">Login to access your account.</p>
-                
-                    <input  id="username" type="text" class="form-control uname" name="email" placeholder="Email" />
-                    <input  id="password" type="password" class="form-control pword" name="password" placeholder="Password" />
-                    <a id="forgot_link" href="javascript:void(0);"><small>Forgot Your Password?</small></a>
-                    <button id="submit_btn" class="btn btn-warning btn-block">Sign In</button>
-					<?php //echo  (ENVIRONMENT === 'development') ?  'CodeIgniter Version <strong>' . CI_VERSION . '</strong>' : '' ?>
+                    <p class="mt5 mb20">Login to access your account via OTP.</p>
+
+                    <input  id="mobile" type="text" class="form-control uname" name="mobile" placeholder="Enter Mobile Number" />
                     
-                </form>
+                    <input type="hidden" name="loginType" id="loginType" value="user">
+                    <a id="forgot_link" href="javascript:void(0);"><small>Resend OTP</small></a>
+                    <button id="get_otp_btn" type="submit" class="btn btn-warning btn-block">GET OTP</button>
+                    <button id="submit_btn" class="btn btn-warning btn-block d_n">Submit</button>
+					    </form>
             </div><!-- col-sm-5 -->
 
             <div class="col-md-5" style="display:none;" id="forgot_div">
@@ -91,10 +102,10 @@
         
         <div class="signup-footer">
             <div class="pull-left">
-               <!-- &copy; 2014. All Rights Reserved. Bracket Bootstrap 3 Admin Template -->
+             
             </div>
             <div class="pull-right">
-               <!-- Created By: <a href="http://themepixels.com/" target="_blank">ThemePixels</a> -->
+               
             </div>
         </div>
         
@@ -103,17 +114,18 @@
 </section>
 
 
-<script src="<?php echo base_url(); ?>js/admin/admin/jquery-1.10.2.min.js"></script>
-<script src="<?php echo base_url(); ?>js/admin/admin/jquery-migrate-1.2.1.min.js"></script>
-<script src="<?php echo base_url(); ?>js/admin/admin/bootstrap.min.js"></script>
-<script src="<?php echo base_url(); ?>js/admin/admin/modernizr.min.js"></script>
-<script src="<?php echo base_url(); ?>js/admin/admin/retina.min.js"></script>
+<script src="<?php echo base_url(); ?>js/admin/jquery-1.10.2.min.js"></script>
+<script src="<?php echo base_url(); ?>js/admin/jquery-migrate-1.2.1.min.js"></script>
+<script src="<?php echo base_url(); ?>js/admin/bootstrap.min.js"></script>
+<script src="<?php echo base_url(); ?>js/admin/modernizr.min.js"></script>
+<script src="<?php echo base_url(); ?>js/admin/retina.min.js"></script>
 
-<script src="<?php echo base_url(); ?>js/admin/admin/custom.js"></script>
+<script src="<?php echo base_url(); ?>js/admin/custom.js"></script>
 
 </body>
 </html>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="<?php echo base_url(); ?>js/admin/jquery.validate.min.js"></script>
 <!-- For Login Panel Validation -->
 <script>
 $(document).ready(function(){
@@ -126,43 +138,81 @@ $(document).ready(function(){
 				$('#msg_div').show();
 				return false;
 			}
-	});
+  });
+
+//************Get One time password authentication*****************
+var form_object = jQuery("#my_signin_form"); 
+
+  form_object.validate({
+    rules: {
+            mobile: {
+                  required: true,
+                  digits: true
+				    }
+	 	},
+    highlight: function(element) {
+      jQuery(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+    },
+    success: function(element) {
+      jQuery(element).closest('.form-group').removeClass('has-error');
+    },
+    submitHandler: function() {
+        var form_data = new FormData($('#my_signin_form')[0]);
+       if(form_data != "")  
+        {
+          $.ajax({
+            type: "POST",
+            url: "<?php echo base_url('login/getOTP');?>",
+            data: form_data,                    
+            cache: false,
+            contentType: false,
+            processData: false,
+            beforeSend: function()
+            {
+              $('.loading').show();
+              $('.loading_icon').show();
+            },
+            success: function(result)
+            {
+            	$('.loading').hide();
+            	$('.loading_icon').hide();
+              if(result != "")
+              {
+                var res = jQuery.parseJSON(result);
+                if(res.type=="success")
+                {
+                  $("#mobile").insertAfter('<input  id="otp" type="password" class="form-control pword d_n" name="otp" placeholder="Enter OTP"/>');
+                  $.growl.notice({title: "<i class='fa fa-check'> Success </i>", message: res.msg });
+                }
+                else
+                {
+                    $.growl.error({title: "<i class='fa fa-times'> Sorry.. </i>", message: res.msg });
+                }
+                $('#categoryModal').modal('hide');
+              }
+              else
+              {
+                $.growl.notice({title: "<i class='fa fa-times'> Sorry.. </i>", message: "Please Try Again!!!" });
+              }
+			      }
+          }); 
+        }
+	}
+
 });
-</script>
-
-<!-- Login Validation End -->
-
-<!-- Forgot Password Start -->   
-
-<script type="text/javascript">
-  $(document).ready(function(){
-    $('#forgot_link').click(function(){
+/** Forgot password link event functionality...  */
+  $('#forgot_link').click(function(){
       $('#signin_div').hide();
       $('#forgot_div').show();
       $('#fu_msg_div').hide();
-    });
   });
-</script>
-
-<!-- Forgot Password End -->
-
-<!-- Sign In Start -->   
-
-<script type="text/javascript">
-  $(document).ready(function(){
-    $('#signin_link').click(function(){
+  /** Do registration submit event handling..   */
+  $('#signin_link').click(function(){
       $('#signin_div').show();
       $('#forgot_div').hide();
       $('#msg_div').hide();
-    });
   });
-</script>
-
-<!-- Sign In Password End -->
-
-<!-- For Forgot Password Validation -->
-<script>
-$(document).ready(function(){
+  /** Forgot password submit functionality.. */
   $('#fu_submit_btn').click(function(){
     var username = $('#fu_username').val();
     if(username == "")
@@ -195,9 +245,11 @@ $(document).ready(function(){
             });
       }
   });
+
 });
 </script>
 
-<!-- Forgot Password End -->
+<!-- Login Validation End -->
+
 
 

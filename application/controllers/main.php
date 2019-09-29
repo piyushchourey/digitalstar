@@ -6,7 +6,7 @@ class Main extends CI_Controller
 	function __construct()
 	{
 		parent::__construct();
-		if ($this->session->userdata('type')=='admin')
+		if ($this->session->userdata('type')=='user')
 			redirect('/home');	
 
 		$this->load->model('category_model'); 
@@ -14,7 +14,6 @@ class Main extends CI_Controller
 	} 
 	function index()
 	{	
-		//print_r($this->session->unset_userdata('otp')); die;
 		if ($this->session->userdata('mob_verify'))
 		{
 			$this->data['sel'] = 'mainpage';
@@ -25,7 +24,7 @@ class Main extends CI_Controller
 		}
 		else
 		{
-			$this->load->view('front/index');
+			$this->load->view('user/index');
 		}
 	}
 	public function logout()
@@ -34,14 +33,6 @@ class Main extends CI_Controller
 		$this->session->unset_userdata('otp');
 		$this->session->unset_userdata('mob_verify');
 		redirect('main');
-	}
-	public function category()
-	{
-
-		$this->data['sel'] = 'ascdxvfcgvh';
-		$this->data['body'] = 'front/product';
-		$this->load->view('structure', $this->data);
-
 	}
 }
 

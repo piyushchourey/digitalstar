@@ -7,7 +7,7 @@
   <meta name="author" content="">
   <script src="<?php echo base_url(); ?>js/admin/jquery-1.10.2.min.js"></script>
   <link rel="shortcut icon" href="<?php echo base_url();?>images/admin/favicon.png" type="image/png">
-  <title>Holla Food | Admin</title>
+  <title>The digital star | Admin</title>
    
   <link href="<?php echo base_url(); ?>css/admin/style.default.css" rel="stylesheet">
   <link rel="stylesheet" href="<?php echo base_url(); ?>css/admin/bootstrap-fileupload.min.css" />
@@ -34,7 +34,7 @@
   <div class="leftpanel">
     
     <div class="logopanel">
-        <h1><span>[</span> Holla Food <span>]</span></h1>
+        <h1><span>[</span> Digital Star <span>]</span></h1>
     </div><!-- logopanel -->
         
     <div class="leftpanelinner">    
@@ -62,12 +62,15 @@
 		<ul class="nav nav-pills nav-stacked nav-bracket">
 		  <li <?php if(isset($sel) and $sel=='dashboard') echo 'class="active"'; ?>>
 			  <a href="<?php echo base_url('home');?>"><i class="fa fa-home"></i> <span>Dashboard</span></a>
+      </li>
+      <li <?php if(isset($sel) and $sel=='Employee Management') echo 'class="active"'; ?>>
+				  <a href="<?php echo base_url('employee');?>"><i class="fa fa-users"></i> <span>Employee Management</span></a>
 		  </li>
-      <!--<li <?php if(isset($sel) and $sel=='Category') echo 'class="active"'; ?>>
-          <a href="<?php echo base_url('category');?>"><i class="fa fa-list"></i> <span>Category</span></a>
-      </li>-->
+      <li <?php if(isset($sel) and $sel=='Campaign') echo 'class="active"'; ?>>
+				  <a href="<?php echo base_url('campaign');?>"><i class="fa fa-gamepad"></i> <span>Campaign</span></a>
+		  </li>
 		  <li <?php if(isset($sel) and $sel=='Category') echo 'class="active"'; ?>>
-				  <a href="<?php echo base_url('category');?>"><i class="fa fa-list"></i> <span>Category</span></a>
+				  <a href="<?php echo base_url('category');?>"><i class="fa fa-list"></i> <span>Task</span></a>
 		  </li>
 		  <li <?php if(isset($sel) and $sel=='Product') echo 'class="active"'; ?>>
 			  <a href="<?php echo base_url('product');?>"><i class="fa fa-cube"></i> <span>Products</span></a>

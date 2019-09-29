@@ -7,7 +7,7 @@
   <meta name="author" content="">
   <link rel="shortcut icon" href="<?php echo base_url(); ?>css/admin/images/favicon.png" type="image/png">
 
-  <title>Holla Food | Admin Panel</title>
+  <title>Digital Star | Admin Panel</title>
 
   <link href="<?php echo base_url(); ?>css/admin/style.default.css" rel="stylesheet">
   <style>
@@ -99,10 +99,10 @@
         
         <div class="signup-footer">
             <div class="pull-left">
-               <!-- &copy; 2014. All Rights Reserved. Bracket Bootstrap 3 Admin Template -->
+             
             </div>
             <div class="pull-right">
-               <!-- Created By: <a href="http://themepixels.com/" target="_blank">ThemePixels</a> -->
+               
             </div>
         </div>
         

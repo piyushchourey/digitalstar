@@ -30,8 +30,10 @@ class Home extends CI_Controller
 	{	
 		if($this->session->userdata('type')=='admin')
 			$this->data['body']='admin/home';
+		else if($this->session->userdata('type')=='Manager') 
+			$this->data['body']='admin/home'; 
 		else
-			$this->data['body']='front/index';
+			$this->data['body']='admin/home';
 		
 		$this->load->view('structure',$this->data);
 	}

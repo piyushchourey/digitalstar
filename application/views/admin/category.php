@@ -91,7 +91,7 @@
         <button type="button" class="close" data-dismiss="modal">&times;</button>
         <h4 class="modal-title" id="myModalLabel">Add Category</h4>
       </div>
-      <form id="categoryForm" action="" class="form-horizontal" method="post" enctype="multipart/form-data">
+      <form id="categoryForm" action="" class="" method="post" enctype="multipart/form-data">
       <div class="modal-body">
   			<div class="form-group">
 			  	<label>Category Type Name</label>

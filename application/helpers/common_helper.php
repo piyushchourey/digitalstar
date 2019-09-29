@@ -68,7 +68,7 @@ if ( ! function_exists('ymddate'))
 {
 	function ymddate($originalDate)
 	{
-		$newDate = date("y-m-d", strtotime($originalDate));
+		$newDate = date("jS M Y h:i:s A", strtotime($originalDate));
 		return $newDate;
 	}
 }

@@ -57,7 +57,7 @@ if(!empty($arr_seg) && $arr_seg[1]=='admin')
 }
 else
 {
-	$route['default_controller'] = 'main';
+ 	$route['default_controller'] = 'main';
 }
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

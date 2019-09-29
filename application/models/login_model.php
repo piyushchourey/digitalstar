@@ -6,6 +6,7 @@ public function signIn($userId,$password)
 {	
 	$this->db->where('email', $userId);
 	$this->db->where('password', $password);
+	$this->db->where('status', 1);
 	$result=$this->db->get('login')->row_array();
 	if(is_array($result))
 		return $result;
