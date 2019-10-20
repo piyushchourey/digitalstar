@@ -48,7 +48,7 @@ class Login extends CI_Controller {
 	public function signIn() 
 	{			
 		if(isset($_POST['loginType']) && $_POST['loginType']=='user'){
-
+			echo "gfdgfd"; 
 		}else{
 			$email = $this->input->post('email');
 			$password = $this->input->post('password');
@@ -71,10 +71,18 @@ class Login extends CI_Controller {
 		}
 	}
 	/** Get OTP from API for user login authentication */
-	public function getOTP(){                                                      
-		if($_POST['mobile'] && is_int($_POST['mobile'])){
-			return array("type"=>"success","otp"=>"123456");
+	public function getOTP(){  
+		if($_POST['mobile']){
+			if ($_POST['mobile']) {
+				$response = array("type"=>"success","otp"=>"123456");
+			} else {
+				$response = array("type"=>"fail","msg"=>"Oop's Invalid Mobile Number.");
+			}
 		}
+		else
+			$response = array("type"=>"fail","msg"=>"Please Try again.");
+		
+		echo json_encode($response);
 	}
 }
 ?>

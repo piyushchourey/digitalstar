@@ -66,10 +66,10 @@
                     <p class="mt5 mb20">Login to access your account via OTP.</p>
 
                     <input  id="mobile" type="text" class="form-control uname" name="mobile" placeholder="Enter Mobile Number" />
-                    
+                    <input  id="otp" type="password" class="form-control pword d_n" name="otp" placeholder="Enter OTP"/>
                     <input type="hidden" name="loginType" id="loginType" value="user">
                     <a id="forgot_link" href="javascript:void(0);"><small>Resend OTP</small></a>
-                    <button id="get_otp_btn" type="submit" class="btn btn-warning btn-block">GET OTP</button>
+                    <button id="get_otp_btn" type="button" class="btn btn-warning btn-block">GET OTP</button>
                     <button id="submit_btn" class="btn btn-warning btn-block d_n">Submit</button>
 					    </form>
             </div><!-- col-sm-5 -->
@@ -108,9 +108,9 @@
                
             </div>
         </div>
-        
+         
     </div><!-- signin -->
-  
+   
 </section>
 
 
@@ -124,7 +124,7 @@
 
 </body>
 </html>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="<?php echo base_url(); ?>js/admin/jquery.validate.min.js"></script>
 <!-- For Login Panel Validation -->
 <script>
@@ -141,64 +141,36 @@ $(document).ready(function(){
   });
 
 //************Get One time password authentication*****************
-var form_object = jQuery("#my_signin_form"); 
-
-  form_object.validate({
-    rules: {
-            mobile: {
-                  required: true,
-                  digits: true
-				    }
-	 	},
-    highlight: function(element) {
-      jQuery(element).closest('.form-group').removeClass('has-success').addClass('has-error');
-    },
-    success: function(element) {
-      jQuery(element).closest('.form-group').removeClass('has-error');
-    },
-    submitHandler: function() {
-        var form_data = new FormData($('#my_signin_form')[0]);
-       if(form_data != "")  
-        {
-          $.ajax({
-            type: "POST",
-            url: "<?php echo base_url('login/getOTP');?>",
-            data: form_data,                    
-            cache: false,
-            contentType: false,
-            processData: false,
-            beforeSend: function()
-            {
-              $('.loading').show();
-              $('.loading_icon').show();
-            },
-            success: function(result)
-            {
-            	$('.loading').hide();
-            	$('.loading_icon').hide();
-              if(result != "")
-              {
-                var res = jQuery.parseJSON(result);
-                if(res.type=="success")
-                {
-                  $("#mobile").insertAfter('<input  id="otp" type="password" class="form-control pword d_n" name="otp" placeholder="Enter OTP"/>');
-                  $.growl.notice({title: "<i class='fa fa-check'> Success </i>", message: res.msg });
-                }
-                else
-                {
-                    $.growl.error({title: "<i class='fa fa-times'> Sorry.. </i>", message: res.msg });
-                }
-                $('#categoryModal').modal('hide');
-              }
-              else
-              {
-                $.growl.notice({title: "<i class='fa fa-times'> Sorry.. </i>", message: "Please Try Again!!!" });
-              }
-			      }
-          }); 
+$('#get_otp_btn').click(function(){
+  let mobile =  $("#mobile").val();
+  if(mobile && (/^\d{10}$/.test(mobile))){
+      let ajaxURL = "<?php echo base_url('login/getOTP');?>";
+      let postData = {"mobile":mobile};
+      commonAjaxService(ajaxURL,postData, function(result){
+        if(result != "")
+        { 
+          var res = jQuery.parseJSON(result);
+          console.log(res);
+          if(res.type=="success")
+          {
+            $("#otp").val("").removeClass('d_n');
+          }
+          else
+          {
+              $("#otp").hide();
+              $.growl.error({title: "<i class='fa fa-times'> Sorry.. </i>", message: res.msg });
+          }
         }
-	}
-
+        else
+        {
+          $.growl.notice({title: "<i class='fa fa-times'> Sorry.. </i>", message: "Please Try Again!!!" });
+        }
+    });
+  }else{
+    alert("Invalid number; must be ten digits")
+    $("#mobile").focus()
+    return false
+  }
 });
 /** Forgot password link event functionality...  */
   $('#forgot_link').click(function(){
@@ -247,9 +219,39 @@ var form_object = jQuery("#my_signin_form");
   });
 
 });
+
+function commonAjaxService(URL,postData,callback){
+  $.ajax({
+            type: "POST",
+            url: URL,
+            data: postData,                    
+            cache: false,
+            beforeSend: function()
+            {
+              $('.loading').show();
+              $('.loading_icon').show();
+            },
+            success: function(result)
+            {
+            	$('.loading').hide();
+             	$('.loading_icon').hide();
+              if(result != "")
+              {
+                callback(result);
+              }
+              else
+              {
+                $.growl.notice({title: "<i class='fa fa-times'> Sorry.. </i>", message: "Please Try Again!!!" });
+              }
+            }
+          });
+}
 </script>
 
 <!-- Login Validation End -->
-
+<div class="loading" style="display:none">
+   <div class="loading_icon" style="display:none"><span class="fa fa-spin fa-spinner"></span>
+   </div>
+</div>
 
 
